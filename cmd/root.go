@@ -31,7 +31,7 @@ var rootCmd = &cobra.Command{
 	Short: "A SBOM Query Module",
 	Long: `A SBOM Query CLI (for issue -> https://github.com/dineshr93/sq/issues)
 	
-	1. List Meta ata (sq meta)
+	1. List Meta data (sq meta)
 	2. List Files
 	3. List Packages
 	4. List Relationships`,
