@@ -16,7 +16,11 @@ import (
 var metaCmd = &cobra.Command{
 	Use:   "meta",
 	Short: "Meta data of the spdx file",
-	Long:  `Meta data of the spdx file`,
+	Long: `Meta data of the spdx file
+	
+For Ex: 
+To list all metadata of spdx: ./sq meta
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		dataFile := string(viper.ConfigFileUsed())
 		s := &model.SPDX{}

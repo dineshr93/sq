@@ -17,10 +17,10 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 Contains following commands
 
 1. List Meta ata (sq meta)
-2. List Relationships (todo ls)
-3. Delete (supports space separated multiple params) (todo delete)
-4. Mark Complete (supports space separated multiple params) (todo complete)
-5. Mark Pending (supports space separated multiple params) (todo pending)
+2. List Relationships (sq ls)
+3. Delete (supports space separated multiple params) (sq delete)
+4. Mark Complete (supports space separated multiple params) (sq complete)
+5. Mark Pending (supports space separated multiple params) (sq pending)
 
 ### Dependencies
 
@@ -30,9 +30,9 @@ Contains following commands
 
 ### Installing
 
-Choose appropriate (binary Releases)[https://github.com/dineshr93/todo/releases]
+Choose appropriate (binary Releases)[https://github.com/dineshr93/sq/releases]
 
-- Rename the binary to 'todo'.
+- Rename the binary to 'sq'.
 - Add the binary to your environment path and use it.
 
 ### Executing program
@@ -40,56 +40,38 @@ Choose appropriate (binary Releases)[https://github.com/dineshr93/todo/releases]
 - How to run the program
 
 ```
-COMMAND FORMAT:
-todo add "project - task - jiraLink"
-todo add "YOUR_PROJECT_NAME - TASK_NAME - http://www.yourcompany.jira.com"
+>sq -h
+A SBOM Query CLI (for issue -> https://github.com/dineshr93/sq/issues)
 
-todo complete TASKID
-<!-- you can also mark multiple tasks to mark complete by passing space separated ids  -->
-todo complete 1 2 ..
-
-todo pending TASKID
-<!-- you can also mark multiple tasks back to mark pending by passing space separated ids  -->
-todo pending 1 2 ..
-
-todo delete TASKID
-<!-- you can also mark multiple tasks for deletion by passing space separated ids  -->
-todo delete 1 2 ..
-```
-
-## Help
-
-any issues please raise an bug reguest
-
-```
->todo -h
-
-        TODO CLI APP (for issue -> https://github.com/dineshr93/todo/issues)
-
-1. Add (todo add)
-2. List (todo ls)
-3. Delete (supports space separated multiple params) (todo delete)
-4. Mark Complete (supports space separated multiple params) (todo complete)
-5. Mark Pending (supports space separated multiple params) (todo pending)
+        1. List Meta ata (sq meta)
+        2. List Files
+        3. List Packages
+        4. List Relationships
 
 Usage:
-  todo [command]
+  sq [command]
 
 Available Commands:
-  add         add a todo Format: Project - task - JIRA link
-  complete    Mark a task as completed(supports space separated multiple params)
-  delete      Delete a task from the list(supports space separated multiple params)
+  files       Command to list files section
   help        Help about any command
-  ls          List all todos
-  pending     Mark a task as pending(supports space separated multiple params)
+  meta        Meta data of the spdx file
+  pkgs        Command to list pkgs section
+  rels        Lists Relationships
 
 Flags:
-      --config string   config file (default is $HOME/.todo.json)
-  -h, --help            help for todo
+      --config string   config file (default is $HOME/.sq.yaml)
+  -h, --help            help for sq
   -t, --toggle          Help message for toggle
 
-Use "todo [command] --help" for more information about a command.
+Use "sq [command] --help" for more information about a command.
 
+
+Alternatively if UI is small to fit every thing, you can save the output to the file
+
+sq meta > sbom-meta.txt
+sq files > sbom-files.txt
+sq pkgs > sbom-pkgs.txt
+sq rels > sbom-rels.txt
 ```
 
 ## Authors
@@ -103,11 +85,10 @@ Dinesh Ravi
 
 ## License
 
-This project is licensed under the Apache License 2.0 or GPL-3.0 - see the [Apache-2.0](LICENSE) file for details
+This project is licensed under the Apache License 2.0 - see the [Apache-2.0](LICENSE) file for details
 
 ## Acknowledgments
 
 - [cobra](https://www.github.com/spf13/cobra)
 - [viper](https://www.github.com/spf13/viper)
 - [simpletable](https://www.github.com/alexeyco/simpletable)
-- [joefazee](https://www.github.com/joefazee) (for models under GPL-2.0)

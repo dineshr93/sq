@@ -32,7 +32,9 @@ var rootCmd = &cobra.Command{
 	Long: `A SBOM Query CLI (for issue -> https://github.com/dineshr93/sq/issues)
 	
 	1. List Meta ata (sq meta)
-	`,
+	2. List Files
+	3. List Packages
+	4. List Relationships`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },

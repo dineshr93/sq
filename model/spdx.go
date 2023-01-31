@@ -127,7 +127,7 @@ func (s *SPDX) PrintMeta() {
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
 		{Text: blue("Spdx creation date")},
-		{Text: s.CreationInfo.Created.Format(time.RFC822)},
+		{Text: yellow(s.CreationInfo.Created.Format(time.RFC822))},
 	})
 	idx++
 	if len(s.CreationInfo.Creators) > 0 {
@@ -140,8 +140,8 @@ func (s *SPDX) PrintMeta() {
 	idx++
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
-		{Text: blue("Project version")},
-		{Text: s.Name},
+		{Text: blue("Project Name")},
+		{Text: red(s.Name)},
 	})
 	idx++
 	cells = append(cells, []*simpletable.Cell{
@@ -165,19 +165,19 @@ func (s *SPDX) PrintMeta() {
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
 		{Text: blue("Number of Packages")},
-		{Text: fmt.Sprintf("%d", len(s.Packages))},
+		{Text: red(fmt.Sprintf("%d", len(s.Packages)))},
 	})
 	idx++
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
 		{Text: blue("Number of Files")},
-		{Text: fmt.Sprintf("%d", len(s.Files))},
+		{Text: red(fmt.Sprintf("%d", len(s.Files)))},
 	})
 	idx++
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
 		{Text: blue("Number of Relationships")},
-		{Text: fmt.Sprintf("%d", len(s.Relationships))},
+		{Text: red(fmt.Sprintf("%d", len(s.Relationships)))},
 	})
 
 	table.Body = &simpletable.Body{Cells: cells}
@@ -185,4 +185,196 @@ func (s *SPDX) PrintMeta() {
 	table.SetStyle(simpletable.StyleUnicode)
 
 	table.Println()
+}
+
+func (s *SPDX) PrintFiles(nf int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "FileName"},
+			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			{Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
+			{Align: simpletable.AlignCenter, Text: "SPDXId"},
+			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			{Align: simpletable.AlignCenter, Text: "Algorithm"},
+			{Align: simpletable.AlignCenter, Text: "checksum"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	files := s.Files
+	var file Files
+	var n int
+	var licenseinfo string
+	lenFiles := len(files)
+	fmt.Println(lenFiles)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < nf; id++ {
+
+		file = files[id]
+
+		n = id + 1
+		licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			{Text: file.FileName},
+			{Text: file.LicenseConcluded},
+			{Text: licenseinfo},
+			{Text: file.Spdxid},
+			{Text: file.CopyrightText},
+			{Text: file.Checksums[0].ChecksumValue},
+			{Text: file.Checksums[0].Algorithm},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenFiles > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 8, Text: blue(fmt.Sprintf("There are %d Files", lenFiles))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+}
+
+func (s *SPDX) Printpkgs(np int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "Name"},
+			{Align: simpletable.AlignCenter, Text: "Supplier"},
+			{Align: simpletable.AlignCenter, Text: "VersionInfo"},
+			{Align: simpletable.AlignCenter, Text: "Homepage"},
+			{Align: simpletable.AlignCenter, Text: "LicenseDeclared"},
+			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
+			{Align: simpletable.AlignCenter, Text: "DownloadLocation"},
+			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			{Align: simpletable.AlignCenter, Text: "Spdxid"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	pkgs := s.Packages
+	var pkg Packages
+	var n int
+	// var licenseinfo string
+	lenPkgs := len(pkgs)
+	fmt.Println(lenPkgs)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < np; id++ {
+
+		pkg = pkgs[id]
+
+		n = id + 1
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			{Text: pkg.Name},
+			{Text: pkg.Supplier},
+			{Text: pkg.VersionInfo},
+			{Text: pkg.Homepage},
+			{Text: pkg.LicenseDeclared},
+			{Text: pkg.LicenseConcluded},
+			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
+			{Text: pkg.DownloadLocation},
+			{Text: pkg.CopyrightText},
+			{Text: pkg.Spdxid},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenPkgs > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 11, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+
+}
+
+func (s *SPDX) PrintRels(np int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "SpdxElementID"},
+			{Align: simpletable.AlignCenter, Text: "RelationshipType"},
+			{Align: simpletable.AlignCenter, Text: "RelatedSpdxElement"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	rels := s.Relationships
+	var rel Relationships
+	var n int
+	// var licenseinfo string
+	lenrels := len(rels)
+	fmt.Println(lenrels)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < np; id++ {
+
+		rel = rels[id]
+
+		n = id + 1
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+		switch rt := rel.RelationshipType; rt {
+		case "CONTAINS":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: rel.SpdxElementID},
+				{Text: blue(rt)},
+				{Text: rel.RelatedSpdxElement},
+			})
+		case "DEPENDS_ON":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: rel.SpdxElementID},
+				{Text: yellow(rt)},
+				{Text: rel.RelatedSpdxElement},
+			})
+		case "DESCRIBES":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: rel.SpdxElementID},
+				{Text: red(rt)},
+				{Text: rel.RelatedSpdxElement},
+			})
+		default:
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: rel.SpdxElementID},
+				{Text: gray(rt)},
+				{Text: rel.RelatedSpdxElement},
+			})
+
+		}
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenrels > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 4, Text: blue(fmt.Sprintf("There are %d relationships", lenrels))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+
 }

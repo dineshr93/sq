@@ -2,13 +2,15 @@ package model
 
 import "fmt"
 
+// https://github.com/shiena/ansicolor/blob/master/README.md
 const (
 	ColorDefault = "\x1b[39m"
 
-	ColorRed   = "\x1b[91m"
-	ColorGreen = "\x1b[32m"
-	ColorBlue  = "\x1b[94m"
-	ColorGray  = "\x1b[90m"
+	ColorRed    = "\x1b[91m"
+	ColorYellow = "\x1b[93m"
+	ColorGreen  = "\x1b[32m"
+	ColorBlue   = "\x1b[94m"
+	ColorGray   = "\x1b[90m"
 )
 
 func red(s string) string {
@@ -25,4 +27,8 @@ func blue(s string) string {
 
 func gray(s string) string {
 	return fmt.Sprintf("%s%s%s", ColorGray, s, ColorDefault)
+}
+
+func yellow(s string) string {
+	return fmt.Sprintf("%s%s%s", ColorYellow, s, ColorDefault)
 }
