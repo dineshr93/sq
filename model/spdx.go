@@ -199,8 +199,8 @@ func (s *SPDX) PrintFiles(nf int) {
 			{Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
 			{Align: simpletable.AlignCenter, Text: "SPDXId"},
 			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
-			{Align: simpletable.AlignCenter, Text: "Algorithm"},
 			{Align: simpletable.AlignCenter, Text: "checksum"},
+			{Align: simpletable.AlignCenter, Text: "Algorithm"},
 		},
 	}
 	// {Align: simpletable.AlignCenter, Text: "Checksums"},
