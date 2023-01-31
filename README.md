@@ -4,7 +4,7 @@ A jq for SPDX 2.2 Querying Utility
 
 ## Description
 
-A binary to query the sbom results.
+A binary to query the spdx-sboms-JSON results.
 
 By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass custom \*.spdx.json file using _--config_ option any time)
 
