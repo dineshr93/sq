@@ -1,6 +1,6 @@
 # sq
 
-An SPDX Querying Binary
+A jq for SPDX 2.2 Querying Utility
 
 ## Description
 
