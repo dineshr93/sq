@@ -8,3 +8,4 @@ bin/sq-linux-386
 bin/sq-windows-386.exe
 bin/sq-windows-amd64.exe
 bin/sq-linux-amd64
+ps-sbom.json
