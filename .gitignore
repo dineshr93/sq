@@ -1,4 +1,5 @@
 
 sbom.spdx.json
-bin/
+bin/sq
 sq
+bin
