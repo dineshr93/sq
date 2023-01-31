@@ -29,7 +29,10 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "sq",
 	Short: "A SBOM Query Module",
-	Long:  `A SBOM Query Module`,
+	Long: `A SBOM Query CLI (for issue -> https://github.com/dineshr93/sq/issues)
+	
+	1. List Meta ata (sq meta)
+	`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -38,6 +41,7 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -65,11 +69,17 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		// Find home directory.
-		home, err := os.UserHomeDir()
-		cobra.CheckErr(err)
+		// home, err := os.UserHomeDir()
+		// cobra.CheckErr(err)
+
+		pwd, err := os.Getwd()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
 		// Search config in home directory with name ".sq" (without extension).
-		viper.AddConfigPath(home)
+		viper.AddConfigPath(pwd)
 		viper.SetConfigType("json")
 		viper.SetConfigName("sbom.spdx")
 	}
@@ -78,6 +88,6 @@ func initConfig() {
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using SBOM file =======>", viper.ConfigFileUsed())
 	}
 }

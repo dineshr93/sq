@@ -6,7 +6,7 @@ An SPDX Querying Binary
 
 A binary to query the sbom results.
 
-By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass custom *.spdx.json file using _--config_ option any time)
+By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass custom \*.spdx.json file using _--config_ option any time)
 
 ## Sample
 
@@ -16,7 +16,7 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 Contains following commands
 
-1. List Files (todo add)
+1. List Meta ata (sq meta)
 2. List Relationships (todo ls)
 3. Delete (supports space separated multiple params) (todo delete)
 4. Mark Complete (supports space separated multiple params) (todo complete)
@@ -31,8 +31,9 @@ Contains following commands
 ### Installing
 
 Choose appropriate (binary Releases)[https://github.com/dineshr93/todo/releases]
+
 - Rename the binary to 'todo'.
-- Add the binary to your environment path and use it. 
+- Add the binary to your environment path and use it.
 
 ### Executing program
 
