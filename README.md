@@ -1,6 +1,6 @@
 # sq
 
-A jq for SPDX 2.2 Querying Utility
+SPDX Query, A jq for SPDX 2.2 Querying Utility
 
 ## Description
 
