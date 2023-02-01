@@ -210,7 +210,7 @@ func (s *SPDX) PrintFiles(nf int) {
 	var n int
 	var licenseinfo string
 	lenFiles := len(files)
-	fmt.Println(lenFiles)
+	// fmt.Println(lenFiles)
 	var cells [][]*simpletable.Cell
 
 	for id := 0; id < nf; id++ {
@@ -269,7 +269,7 @@ func (s *SPDX) Printpkgs(np int) {
 	var n int
 	// var licenseinfo string
 	lenPkgs := len(pkgs)
-	fmt.Println(lenPkgs)
+	// fmt.Println(lenPkgs)
 	var cells [][]*simpletable.Cell
 
 	for id := 0; id < np; id++ {
@@ -325,7 +325,7 @@ func (s *SPDX) PrintRels(np int) {
 	var n int
 	// var licenseinfo string
 	lenrels := len(rels)
-	fmt.Println(lenrels)
+	// fmt.Println(lenrels)
 	var cells [][]*simpletable.Cell
 
 	for id := 0; id < np; id++ {

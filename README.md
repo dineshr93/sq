@@ -16,6 +16,9 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 ![Sample](https://github.com/dineshr93/sq/blob/main/sample.png?raw=true)
 
+with --config option 
+![Sample](https://github.com/dineshr93/sq/blob/main/sample2.png?raw=true)
+
 ## Getting Started
 
 Contains following commands
