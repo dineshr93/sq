@@ -17,9 +17,9 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 Contains following commands
 
         1. List Meta data (sq meta)
-        2. List Files
-        3. List Packages
-        4. List Relationships
+        2. List Files(sq files)
+        3. List Packages (sq pkgs)
+        4. List Relationships (sq rels)
 
 ### Dependencies
 
