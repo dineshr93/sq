@@ -16,11 +16,10 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 Contains following commands
 
-1. List Meta ata (sq meta)
-2. List Relationships (sq ls)
-3. Delete (supports space separated multiple params) (sq delete)
-4. Mark Complete (supports space separated multiple params) (sq complete)
-5. Mark Pending (supports space separated multiple params) (sq pending)
+        1. List Meta data (sq meta)
+        2. List Files
+        3. List Packages
+        4. List Relationships
 
 ### Dependencies
 
