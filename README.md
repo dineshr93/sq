@@ -2,6 +2,10 @@
 
 SPDX Query, A jq for SPDX 2.2 Querying Utility
 
+Note for newbies: SPDX is a format where sw entities discloses what open source libraries they have used in building their software. Security expers and legal compliance experts uses this data to check if they have any license issues or security vulnerability is there..
+
+https://en.m.wikipedia.org/wiki/Software_Package_Data_Exchange
+
 ## Description
 
 A binary to query the spdx-sboms-JSON results.
