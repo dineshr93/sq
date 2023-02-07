@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Dinesh Ravi
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package model
 
 import (

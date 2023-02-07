@@ -34,7 +34,7 @@ copy: $@ ## Copy binary to desired environment path (please modify)
 reuse: $@ ## Add reuse compliant copyright and license
 
 reuse:
-	reuse addheader --year 2023 --license Apache-2.0 --copyright "Dinesh Ravi" *.go cmd/*.go
+	reuse addheader --year 2023 --license Apache-2.0 --copyright "Dinesh Ravi" *.go cmd/*.go model/*.go
 
 init:
 	echo "make init n=modulename"
