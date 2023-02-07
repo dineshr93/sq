@@ -1,6 +1,8 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
+// Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+// SPDX-FileCopyrightText: 2023 Dinesh Ravi
+//
+// SPDX-License-Identifier: Apache-2.0
+
 package cmd
 
 import (
