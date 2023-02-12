@@ -16,7 +16,7 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 ![Sample](https://github.com/dineshr93/sq/blob/main/sample.png?raw=true)
 
-with --config option 
+with --config option
 ![Sample](https://github.com/dineshr93/sq/blob/main/sample2.png?raw=true)
 
 ## Getting Started
@@ -41,7 +41,7 @@ Choose appropriate (binary Releases)[https://github.com/dineshr93/sq/releases]
 - Rename the binary to 'sq'.
 - Add the binary to your environment path and use it.
 
-### Executing program
+### How to run
 
 - How to run the program
 
