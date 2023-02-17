@@ -19,6 +19,9 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 with --config option
 ![Sample](https://github.com/dineshr93/sq/blob/main/sample2.png?raw=true)
 
+with relation dig option
+![Sample](https://github.com/dineshr93/sq/blob/main/dig.png?raw=true)
+
 ## Getting Started
 
 Contains following commands
@@ -70,8 +73,22 @@ Flags:
   -t, --toggle          Help message for toggle
 
 Use "sq [command] --help" for more information about a command.
+================================================================
+>sq rels dig -h
+dig the relationship and show actual packages and files
 
+For Ex:
+To list all relationship: ./sq rels dig
 
+Usage:
+  sq rels dig [flags]
+
+Flags:
+  -h, --help   help for dig
+
+Global Flags:
+      --config string   YOUR SBOM JSON FILE (default is $CURRENT_DIR/sbom.spdx.json)
+=================================================================
 Alternatively if UI is small to fit every thing, you can save the output to the file
 
 sq meta > sbom-meta.txt

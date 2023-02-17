@@ -382,3 +382,119 @@ func (s *SPDX) PrintRels(np int) {
 	table.Println()
 
 }
+
+func removeDuplicateStr(strSlice []string) []string {
+	allKeys := make(map[string]bool)
+	list := []string{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
+}
+
+//	func (s *SPDX) getrelspdxelem(spdxID string) (string, Relationships) {
+//		rels := s.Relationships
+//		for _, rel := range rels {
+//			if rel.SpdxElementID == spdxID {
+//				return rel.RelatedSpdxElement, rel
+//			}
+//		}
+//		return "", Relationships{}
+//	}
+func (s *SPDX) getdependson(d int, rel1 Relationships) {
+	pkgs := s.Packages
+	var nextSPDXidDetail string
+	var SPDXidDetail string
+	// fmt.Println("===================DEPENDS_ON======================")
+	for _, pkg := range pkgs {
+		if pkg.Spdxid == rel1.SpdxElementID {
+			SPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(pkg.Name), yellow("|"), blue(pkg.VersionInfo))
+		}
+		if pkg.Spdxid == rel1.RelatedSpdxElement {
+			nextSPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(pkg.Name), yellow("|"), blue(pkg.VersionInfo))
+		}
+
+	}
+
+	fmt.Println(fmt.Sprintf("%v =====> %v Pkg %v =====> %v", SPDXidDetail, green("DEPENDS_ON"), blue(fmt.Sprintf("%d", d)), nextSPDXidDetail))
+}
+func (s *SPDX) getspdxpkg(d int, spdxID string, rel1 Relationships) {
+	pkgs := s.Packages
+	var filespdxids []string
+	var SPDXidDetail string
+	// var nextSPDXid string
+	// var rel Relationships
+	for _, pkg := range pkgs {
+		if pkg.Spdxid == spdxID {
+			SPDXidDetail = fmt.Sprintf("%v | version: %v", yellow(pkg.Name), yellow(pkg.VersionInfo))
+			if len(pkg.HasFiles) > 0 {
+
+				filespdxids = pkg.HasFiles
+				for i, filespdx := range filespdxids {
+					s.getspdxfile(i, filespdx, SPDXidDetail)
+				}
+			}
+			// d++
+			// nextSPDXid, rel = s.getrelspdxelem(spdxID)
+			// if nextSPDXid != "" {
+			// 	s.getspdxpkg(d, nextSPDXid, rel)
+			// }
+		}
+	}
+}
+func (s *SPDX) getspdxfile(i int, spdxID string, SPDXidDetail string) {
+	files := s.Files
+	for _, file := range files {
+		if file.Spdxid == spdxID {
+			i++
+			fmt.Println(green(fmt.Sprintf("%v %v %v File %v %v %v", SPDXidDetail, yellow("---->"), red("CONTAINS"), blue(fmt.Sprintf("%d", i)), yellow("---->"), red(file.FileName))))
+		}
+
+	}
+	// n = 0
+	// return ""
+}
+
+func (s *SPDX) PrintDigRels() {
+	rels := s.Relationships
+	var rel Relationships
+	var n int
+	_ = n
+	lenrels := len(rels)
+	var spdxids []string = make([]string, lenrels)
+	// var licenseinfo string
+	//
+	for id := 0; id < lenrels; id++ {
+		rel = rels[id]
+		spdxids = append(spdxids, rel.SpdxElementID)
+	}
+	unique_spdxIDs := removeDuplicateStr(spdxids)
+	len_unique_spdxIDs := len(unique_spdxIDs)
+	fmt.Println("No. of unique spdxID :", len_unique_spdxIDs)
+	// _ = len_unique_spdxIDs
+	var d int
+
+	fmt.Println(red("===================DESCRIBES======================"))
+	for _, rel1 := range rels {
+		switch rt := rel1.RelationshipType; rt {
+		case "DESCRIBES":
+			d++
+			s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
+		}
+
+	}
+	d = 0
+	fmt.Println(red("===================DEPENDS_ON======================"))
+	for _, rel1 := range rels {
+		switch rt := rel1.RelationshipType; rt {
+		case "DEPENDS_ON":
+			d++
+			s.getdependson(d, rel1)
+			s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
+		}
+	}
+
+}
