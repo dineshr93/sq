@@ -54,10 +54,10 @@ Choose appropriate (binary Releases)[https://github.com/dineshr93/sq/releases]
 A SBOM Query CLI (for issue -> https://github.com/dineshr93/sq/issues)
 
         1. List Meta data (sq meta)
-        2. List Files
-        3. List Packages
-        4. List Relationships
-        5. List PKGS & FILES Relationships
+        2. List Files (sq files)
+        3. List Packages (sq pkgs)
+        4. List Relationships (sq rels)
+        5. List pkgs and files in Relationships (sq rels dig)
 
 Usage:
   sq [command]
