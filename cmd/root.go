@@ -24,7 +24,9 @@ var rootCmd = &cobra.Command{
 	1. List Meta data (sq meta)
 	2. List Files
 	3. List Packages
-	4. List Relationships`,
+	4. List Relationships
+	5. List pkgs and files in Relationships`,
+
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
