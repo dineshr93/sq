@@ -9,3 +9,4 @@ bin/sq-windows-386.exe
 bin/sq-windows-amd64.exe
 bin/sq-linux-amd64
 ps-sbom.json
+sbom_2023-02-24_100502.spdx.json

@@ -436,7 +436,20 @@ func (s *SPDX) getspdxpkg(d int, spdxID string, rel1 Relationships) {
 				for i, filespdx := range filespdxids {
 					s.getspdxfile(i, filespdx, SPDXidDetail)
 				}
+			} else {
+				var f int
+				for _, rel1 := range s.Relationships {
+					if rel1.SpdxElementID == spdxID {
+						switch rt := rel1.RelationshipType; rt {
+						case "CONTAINS":
+
+							s.getspdxfile(f, rel1.RelatedSpdxElement, SPDXidDetail)
+						}
+					}
+				}
+
 			}
+
 			// d++
 			// nextSPDXid, rel = s.getrelspdxelem(spdxID)
 			// if nextSPDXid != "" {
