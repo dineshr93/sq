@@ -14,6 +14,9 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 ## Sample
 
+with `sq meta` option
+![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/meta.png?raw=true)
+
 with `sq pkgs` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/sq_pkgs.png?raw=true)
 
