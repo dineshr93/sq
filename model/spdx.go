@@ -254,16 +254,16 @@ func (s *SPDX) Printpkgs(np int) {
 	table.Header = &simpletable.Header{
 		Cells: []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: "#"},
-			{Align: simpletable.AlignCenter, Text: "Name"},
 			{Align: simpletable.AlignCenter, Text: "Supplier"},
+			{Align: simpletable.AlignCenter, Text: "Name"},
 			{Align: simpletable.AlignCenter, Text: "VersionInfo"},
 			{Align: simpletable.AlignCenter, Text: "Homepage"},
-			{Align: simpletable.AlignCenter, Text: "LicenseDeclared"},
-			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
-			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
-			{Align: simpletable.AlignCenter, Text: "DownloadLocation"},
-			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
-			{Align: simpletable.AlignCenter, Text: "Spdxid"},
+			// {Align: simpletable.AlignCenter, Text: "LicenseDeclared"},
+			// {Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			// {Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
+			// {Align: simpletable.AlignCenter, Text: "DownloadLocation"},
+			// {Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			// {Align: simpletable.AlignCenter, Text: "Spdxid"},
 		},
 	}
 	// {Align: simpletable.AlignCenter, Text: "Checksums"},
@@ -285,16 +285,16 @@ func (s *SPDX) Printpkgs(np int) {
 
 		cells = append(cells, *&[]*simpletable.Cell{
 			{Text: fmt.Sprintf("%d", n)},
-			{Text: pkg.Name},
 			{Text: pkg.Supplier},
+			{Text: pkg.Name},
 			{Text: pkg.VersionInfo},
 			{Text: pkg.Homepage},
-			{Text: pkg.LicenseDeclared},
-			{Text: pkg.LicenseConcluded},
-			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
-			{Text: pkg.DownloadLocation},
-			{Text: pkg.CopyrightText},
-			{Text: pkg.Spdxid},
+			// {Text: pkg.LicenseDeclared},
+			// {Text: pkg.LicenseConcluded},
+			// {Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
+			// {Text: pkg.DownloadLocation},
+			// {Text: pkg.CopyrightText},
+			// {Text: pkg.Spdxid},
 		})
 
 	}
@@ -302,7 +302,134 @@ func (s *SPDX) Printpkgs(np int) {
 
 	if lenPkgs > 0 {
 		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
-			{Align: simpletable.AlignCenter, Span: 11, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
+			{Align: simpletable.AlignCenter, Span: 5, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+
+}
+
+func (s *SPDX) PrintpkgsIP(np int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			// {Align: simpletable.AlignCenter, Text: "Supplier"},
+			{Align: simpletable.AlignCenter, Text: "Name"},
+			{Align: simpletable.AlignCenter, Text: "VersionInfo"},
+			// {Align: simpletable.AlignCenter, Text: "Homepage"},
+			{Align: simpletable.AlignCenter, Text: "LicenseDeclared"},
+			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
+			// {Align: simpletable.AlignCenter, Text: "DownloadLocation"},
+			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
+			// {Align: simpletable.AlignCenter, Text: "Spdxid"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	pkgs := s.Packages
+	var pkg Packages
+	var n int
+	// var licenseinfo string
+	lenPkgs := len(pkgs)
+	// fmt.Println(lenPkgs)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < np; id++ {
+
+		pkg = pkgs[id]
+
+		n = id + 1
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			// {Text: pkg.Supplier},
+			{Text: pkg.Name},
+			{Text: pkg.VersionInfo},
+			// {Text: pkg.Homepage},
+			{Text: pkg.LicenseDeclared},
+			{Text: pkg.LicenseConcluded},
+
+			// {Text: pkg.DownloadLocation},
+			{Text: pkg.CopyrightText},
+			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
+			// {Text: pkg.Spdxid},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenPkgs > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 8, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+
+}
+func (s *SPDX) PrintpkgsExt(np int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "Supplier"},
+			{Align: simpletable.AlignCenter, Text: "Name"},
+			{Align: simpletable.AlignCenter, Text: "VersionInfo"},
+			{Align: simpletable.AlignCenter, Text: "Homepage"},
+			{Align: simpletable.AlignCenter, Text: "LicenseDeclared"},
+			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
+			{Align: simpletable.AlignCenter, Text: "DownloadLocation"},
+			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			// {Align: simpletable.AlignCenter, Text: "Spdxid"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	pkgs := s.Packages
+	var pkg Packages
+	var n int
+	// var licenseinfo string
+	lenPkgs := len(pkgs)
+	// fmt.Println(lenPkgs)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < np; id++ {
+
+		pkg = pkgs[id]
+
+		n = id + 1
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			{Text: pkg.Supplier},
+			{Text: pkg.Name},
+			{Text: pkg.VersionInfo},
+			{Text: pkg.Homepage},
+			{Text: pkg.LicenseDeclared},
+			{Text: pkg.LicenseConcluded},
+			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
+			{Text: pkg.DownloadLocation},
+			{Text: pkg.CopyrightText},
+			// {Text: pkg.Spdxid},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenPkgs > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 10, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
 		}}
 	}
 	table.SetStyle(simpletable.StyleUnicode)
