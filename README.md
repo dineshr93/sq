@@ -14,18 +14,16 @@ By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass cust
 
 ## Sample
 
-with `sq meta` option
+Display meta data with `sq meta` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/meta.png?raw=true)
 
-with `sq pkgs` option
+Display pkgs list with `sq pkgs` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/sq_pkgs.png?raw=true)
 
-![Sample](https://github.com/dineshr93/sq/blob/main/sample.png?raw=true)
+Display files list with `sq files` option
+![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/files.png?raw=true)
 
-with `--config` option
-![Sample](https://github.com/dineshr93/sq/blob/main/sample2.png?raw=true)
-
-with relation `sq rels dig` option
+Display spdx relationships list with `sq rels dig` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/dig.png?raw=true)
 
 ## Getting Started

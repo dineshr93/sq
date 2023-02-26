@@ -199,6 +199,116 @@ func (s *SPDX) PrintFiles(nf int) {
 		Cells: []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: "#"},
 			{Align: simpletable.AlignCenter, Text: "FileName"},
+			// {Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			// {Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
+			// {Align: simpletable.AlignCenter, Text: "SPDXId"},
+			// {Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			{Align: simpletable.AlignCenter, Text: "checksum"},
+			{Align: simpletable.AlignCenter, Text: "Algorithm"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	files := s.Files
+	var file Files
+	var n int
+	// var licenseinfo string
+	lenFiles := len(files)
+	// fmt.Println(lenFiles)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < nf; id++ {
+
+		file = files[id]
+
+		n = id + 1
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			{Text: file.FileName},
+			// {Text: file.LicenseConcluded},
+			// {Text: licenseinfo},
+			// {Text: file.Spdxid},
+			// {Text: file.CopyrightText},
+			{Text: file.Checksums[0].ChecksumValue},
+			{Text: file.Checksums[0].Algorithm},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenFiles > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 4, Text: blue(fmt.Sprintf("There are %d Files", lenFiles))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+}
+func (s *SPDX) PrintFilesIP(nf int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "FileName"},
+			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
+			{Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
+			// {Align: simpletable.AlignCenter, Text: "SPDXId"},
+			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
+			// {Align: simpletable.AlignCenter, Text: "checksum"},
+			// {Align: simpletable.AlignCenter, Text: "Algorithm"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	files := s.Files
+	var file Files
+	var n int
+	var licenseinfo string
+	lenFiles := len(files)
+	// fmt.Println(lenFiles)
+	var cells [][]*simpletable.Cell
+
+	for id := 0; id < nf; id++ {
+
+		file = files[id]
+
+		n = id + 1
+		licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+
+		cells = append(cells, *&[]*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", n)},
+			{Text: file.FileName},
+			{Text: file.LicenseConcluded},
+			{Text: licenseinfo},
+			// {Text: file.Spdxid},
+			{Text: file.CopyrightText},
+			// {Text: file.Checksums[0].ChecksumValue},
+			// {Text: file.Checksums[0].Algorithm},
+		})
+
+	}
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenFiles > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 5, Text: blue(fmt.Sprintf("There are %d Files", lenFiles))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+}
+func (s *SPDX) PrintFilesExt(nf int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "FileName"},
 			{Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
 			{Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
 			{Align: simpletable.AlignCenter, Text: "SPDXId"},
@@ -246,7 +356,6 @@ func (s *SPDX) PrintFiles(nf int) {
 	table.SetStyle(simpletable.StyleUnicode)
 	table.Println()
 }
-
 func (s *SPDX) Printpkgs(np int) {
 
 	table := simpletable.New()
