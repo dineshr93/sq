@@ -82,8 +82,9 @@ func init() {
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 func isvalidSPDXJSONFile(spdxjsonFile string) bool {
+	// fmt.Println(filepath.Ext(strings.TrimSpace(spdxjsonFile)))
 	if filepath.Ext(strings.TrimSpace(spdxjsonFile)) != ".json" {
-		fmt.Println("Error: Not a JSON file")
+		fmt.Println("Error:", spdxjsonFile, " Not a JSON file")
 		return false
 	}
 	// check if valid json if SPDXID Keyword is present in file
@@ -122,7 +123,7 @@ func initConfig() {
 		for _, s := range findFiles(pwd, ".json") {
 			// viper.SetConfigType("json")
 			// viper.SetConfigName("sbom.spdx")
-			if !isSPDXJSONFilefound && isvalidSPDXJSONFile(cfgFile) {
+			if !isSPDXJSONFilefound && isvalidSPDXJSONFile(s) {
 				viper.SetConfigFile(s)
 				isSPDXJSONFilefound = true
 			}
