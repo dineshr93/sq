@@ -7,7 +7,11 @@ package cmd
 
 import (
 	"fmt"
+	"io/fs"
+	"io/ioutil"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -42,6 +46,28 @@ func Execute() {
 	}
 }
 
+func findFiles(root, ext string) []string {
+	var a []string
+	filepath.WalkDir(root, func(s string, d fs.DirEntry, e error) error {
+		if e != nil {
+			return e
+		}
+		if filepath.Ext(d.Name()) == ext {
+			a = append(a, s)
+		}
+		return nil
+	})
+	return a
+}
+func isStringInFile(anyFile, text string) bool {
+	b, err := ioutil.ReadFile(anyFile)
+	if err != nil {
+		panic(err)
+	}
+	s := string(b)
+	// //check whether s contains substring text
+	return strings.Contains(s, text)
+}
 func init() {
 	cobra.OnInitialize(initConfig)
 
@@ -55,12 +81,29 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
+func isvalidSPDXJSONFile(spdxjsonFile string) bool {
+	if filepath.Ext(strings.TrimSpace(spdxjsonFile)) != ".json" {
+		fmt.Println("Error: Not a JSON file")
+		return false
+	}
+	// check if valid json if SPDXID Keyword is present in file
+	if !isStringInFile(spdxjsonFile, "SPDXID") {
+		fmt.Println("Error: Not a Valid SPDX JSON file")
+		return false
+	}
+	return true
+}
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
-		// Use config file from the flag.
+		// Check if valid json and spdx file and fail if not
+		if !isvalidSPDXJSONFile(cfgFile) {
+			os.Exit(1)
+		}
+
 		viper.SetConfigFile(cfgFile)
+
 	} else {
 		// Find home directory.
 		// home, err := os.UserHomeDir()
@@ -72,10 +115,24 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".sq" (without extension).
 		viper.AddConfigPath(pwd)
-		viper.SetConfigType("json")
-		viper.SetConfigName("sbom.spdx")
+		var isSPDXJSONFilefound bool = false
+		fmt.Println("--config option not passed So finding first valid spdx json file in current folder")
+
+		for _, s := range findFiles(pwd, ".json") {
+			// viper.SetConfigType("json")
+			// viper.SetConfigName("sbom.spdx")
+			if !isSPDXJSONFilefound && isvalidSPDXJSONFile(cfgFile) {
+				viper.SetConfigFile(s)
+				isSPDXJSONFilefound = true
+			}
+		}
+
+		if !isSPDXJSONFilefound {
+			fmt.Println("No valid spdx json format file found in current directory!")
+			os.Exit(1)
+		}
+
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
