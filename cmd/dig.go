@@ -33,15 +33,8 @@ To list all relationship: ./sq rels dig`,
 		lenRels := len(rels)
 
 		if len(args) > 0 {
-			// fmt.Sprintln(len(args))
-			// i, err := strconv.Atoi(args[0])
-			// if err != nil {
-			// 	panic(err)
-			// }
-			// s.PrintDigRels(i)
 			s.PrintDigRels()
 		} else {
-			// fmt.Sprintln(lenRels)
 			if lenRels > 0 {
 				s.PrintDigRels()
 			}

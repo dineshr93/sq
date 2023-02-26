@@ -28,6 +28,7 @@ type SPDX struct {
 	Packages                   []Packages                   `json:"packages,omitempty"`
 	Files                      []Files                      `json:"files,omitempty"`
 	Relationships              []Relationships              `json:"relationships,omitempty"`
+	RelTypes                   RelTypes                     `json:"reltypes,omitempty"`
 }
 type CreationInfo struct {
 	Created            time.Time `json:"created,omitempty"`
@@ -76,7 +77,35 @@ type Relationships struct {
 	RelatedSpdxElement string `json:"relatedSpdxElement,omitempty"`
 	RelationshipType   string `json:"relationshipType,omitempty"`
 }
+type RelTypes struct {
+	Describes []Relationships
+	Dependson []Relationships
+	Contains  []Relationships
+}
 
+func (s *SPDX) GetRelationsforType() {
+	rels := s.Relationships
+
+	var relDescribes []Relationships
+	var relDependson []Relationships
+	var relContains []Relationships
+	for _, rel := range rels {
+		switch rt := rel.RelationshipType; rt {
+		case "DESCRIBES":
+			relDescribes = append(relDescribes, rel)
+		case "DEPENDS_ON":
+			relDependson = append(relDependson, rel)
+		case "CONTAINS":
+			relContains = append(relContains, rel)
+		}
+	}
+	relTypes := RelTypes{
+		Describes: relDescribes,
+		Dependson: relDependson,
+		Contains:  relContains,
+	}
+	s.RelTypes = relTypes
+}
 func (t *SPDX) Load(filename string) error {
 	file, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -636,21 +665,21 @@ func (s *SPDX) PrintRels(np int) {
 			cells = append(cells, *&[]*simpletable.Cell{
 				{Text: fmt.Sprintf("%d", n)},
 				{Text: rel.SpdxElementID},
-				{Text: blue(rt)},
+				{Text: red(rt)},
 				{Text: rel.RelatedSpdxElement},
 			})
 		case "DEPENDS_ON":
 			cells = append(cells, *&[]*simpletable.Cell{
 				{Text: fmt.Sprintf("%d", n)},
 				{Text: rel.SpdxElementID},
-				{Text: yellow(rt)},
+				{Text: blue(rt)},
 				{Text: rel.RelatedSpdxElement},
 			})
 		case "DESCRIBES":
 			cells = append(cells, *&[]*simpletable.Cell{
 				{Text: fmt.Sprintf("%d", n)},
 				{Text: rel.SpdxElementID},
-				{Text: red(rt)},
+				{Text: green(rt)},
 				{Text: rel.RelatedSpdxElement},
 			})
 		default:
@@ -688,154 +717,130 @@ func removeDuplicateStr(strSlice []string) []string {
 	return list
 }
 
-//	func (s *SPDX) getrelspdxelem(spdxID string) (string, Relationships) {
-//		rels := s.Relationships
-//		for _, rel := range rels {
-//			if rel.SpdxElementID == spdxID {
-//				return rel.RelatedSpdxElement, rel
-//			}
-//		}
-//		return "", Relationships{}
-//	}
-func (s *SPDX) getdependson(d int, rel1 Relationships) {
+func (s *SPDX) getPKGforSPDXID(spdxid string) (Packages, bool) {
 	pkgs := s.Packages
-	var nextSPDXidDetail string
-	var SPDXidDetail string
-	// fmt.Println("===================DEPENDS_ON======================")
 	for _, pkg := range pkgs {
-		if pkg.Spdxid == rel1.SpdxElementID {
-			SPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(pkg.Name), yellow("|"), blue(pkg.VersionInfo))
-		}
-		if pkg.Spdxid == rel1.RelatedSpdxElement {
-			if len(pkg.HasFiles) > 0 {
-				nextSPDXidDetail = fmt.Sprintf("%v %v version: %v", yellow(pkg.Name), yellow("|"), yellow(pkg.VersionInfo))
-				continue
-			}
-			nextSPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(pkg.Name), yellow("|"), blue(pkg.VersionInfo))
-		}
-
-	}
-
-	fmt.Println(fmt.Sprintf("%v =====> %v Pkg %v =====> %v", SPDXidDetail, green("DEPENDS_ON"), blue(fmt.Sprintf("%d", d)), nextSPDXidDetail))
-}
-func (s *SPDX) getspdxpkg(d int, spdxID string, rel1 Relationships) {
-	pkgs := s.Packages
-	var filespdxids []string
-	var SPDXidDetail string
-	// var nextSPDXid string
-	// var rel Relationships
-	for _, pkg := range pkgs {
-		if pkg.Spdxid == spdxID {
-
-			if len(pkg.HasFiles) > 0 {
-				SPDXidDetail = fmt.Sprintf("%v | version: %v", yellow(pkg.Name), yellow(pkg.VersionInfo))
-				filespdxids = pkg.HasFiles
-				fmt.Println(red("-----------Digging one more level deep-----------"))
-				for i, filespdx := range filespdxids {
-					s.getspdxfile(i, filespdx, SPDXidDetail)
-				}
-				fmt.Println()
-			} else {
-				SPDXidDetail = fmt.Sprintf("%v | version: %v", blue(pkg.Name), blue(pkg.VersionInfo))
-				var f int
-				for _, rel1 := range s.Relationships {
-					if rel1.SpdxElementID == spdxID {
-						switch rt := rel1.RelationshipType; rt {
-						case "CONTAINS":
-							fmt.Println(red("-----------Digging one more level deep-----------"))
-							s.getspdxfile(f, rel1.RelatedSpdxElement, SPDXidDetail)
-							fmt.Println()
-						}
-					}
-				}
-
-			}
-
-			// d++
-			// nextSPDXid, rel = s.getrelspdxelem(spdxID)
-			// if nextSPDXid != "" {
-			// 	s.getspdxpkg(d, nextSPDXid, rel)
-			// }
+		if spdxid == pkg.Spdxid {
+			return pkg, true
 		}
 	}
+	return Packages{}, false
 }
-func (s *SPDX) getspdxfile(i int, spdxID string, SPDXidDetail string) {
+func (s *SPDX) getFileforSPDXID(spdxid string) Files {
 	files := s.Files
-	for _, file := range files {
-		if file.Spdxid == spdxID {
-			i++
-			fmt.Println(green(fmt.Sprintf("%v %v %v File %v %v %v", SPDXidDetail, yellow("---->"), red("CONTAINS"), blue(fmt.Sprintf("%d", i)), yellow("---->"), red(file.FileName))))
+	for _, file_ := range files {
+		if spdxid == file_.Spdxid {
+			return file_
 		}
-
 	}
-
-	// n = 0
-	// return ""
+	return Files{}
+}
+func (s *SPDX) getRelationshipForSPDXID(spdxid string, rels []Relationships) []Relationships {
+	var relTmp []Relationships
+	for _, rel := range rels {
+		if spdxid == rel.SpdxElementID {
+			relTmp = append(relTmp, rel)
+		}
+	}
+	return relTmp
+}
+func (s *SPDX) getPKGNameVersionDetailforRelsSPDXID(rel Relationships) (string, string) {
+	var SPDXidDetail, relatedSPDXidDetail string
+	spdxpkg, _ := s.getPKGforSPDXID(rel.SpdxElementID)
+	SPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(spdxpkg.Name), yellow("|"), blue(spdxpkg.VersionInfo))
+	relatedspdxpkg, _ := s.getPKGforSPDXID(rel.RelatedSpdxElement)
+	if len(relatedspdxpkg.HasFiles) > 0 {
+		relatedSPDXidDetail = fmt.Sprintf("%v %v version: %v", yellow(relatedspdxpkg.Name), yellow("|"), yellow(relatedspdxpkg.VersionInfo))
+	} else {
+		relatedSPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(relatedspdxpkg.Name), yellow("|"), blue(relatedspdxpkg.VersionInfo))
+	}
+	return SPDXidDetail, relatedSPDXidDetail
 }
 
+func (s *SPDX) printspdxpkg(d int, spdxID string, rel Relationships) {
+	var filespdxids []string
+
+	pkg, _ := s.getPKGforSPDXID(spdxID)
+	// var SPDXidDetail string
+	// SPDXidDetail = fmt.Sprintf("%v | version: %v", yellow(pkg.Name), yellow(pkg.VersionInfo))
+
+	if len(pkg.HasFiles) > 0 {
+		filespdxids = pkg.HasFiles
+		// fmt.Println(red("    |-----------Digging one more level deep-----------"))
+		// fmt.Println(green(fmt.Sprintf("    |-->%v %v %v", SPDXidDetail, yellow("---->"), red("CONTAINS"))))
+		for i, filespdx := range filespdxids {
+			s.printspdxfile(i, filespdx)
+		}
+		// fmt.Println()
+	} else {
+		// To Dig for files for pkg which doesnt have parameter HasFiles
+		// All relationships with particular spdxid with Contains relationship
+		// Dig for SpdxElementID
+		rels := s.getRelationshipForSPDXID(rel.SpdxElementID, s.RelTypes.Contains)
+		for f, rel := range rels {
+			fmt.Println()
+			// fmt.Println(red("    |-----------Digging one more level deep-----------"))
+			// fmt.Println(green(fmt.Sprintf("    |-->%v %v %v", SPDXidDetail, yellow("---->"), red("CONTAINS"))))
+			s.printspdxfile(f, rel.RelatedSpdxElement)
+			// fmt.Println()
+		}
+		// Dig for RelatedSpdxElement
+		rels = s.getRelationshipForSPDXID(rel.RelatedSpdxElement, s.RelTypes.Contains)
+		for f, rel := range rels {
+			// fmt.Println()
+			// fmt.Println(red("    |-----------Digging one more level deep-----------"))
+			// fmt.Println(green(fmt.Sprintf("    |-->%v %v %v", SPDXidDetail, yellow("---->"), red("CONTAINS"))))
+			s.printspdxfile(f, rel.RelatedSpdxElement)
+			// fmt.Println()
+		}
+	}
+}
+
+func (s *SPDX) printspdxfile(i int, spdxID string) {
+	file := s.getFileforSPDXID(spdxID)
+	i++
+	fmt.Println(green(fmt.Sprintf("    |-->File %v %v %v", blue(fmt.Sprintf("%d", i)), yellow("---->"), red(file.FileName))))
+}
+func (s *SPDX) printdependson(d int, rel Relationships) {
+	_, relatedSPDXidDetail := s.getPKGNameVersionDetailforRelsSPDXID(rel)
+	fmt.Println(fmt.Sprintf(" |-->Pkg %v %v", blue(fmt.Sprintf("%d", d)), relatedSPDXidDetail))
+	// fmt.Println(fmt.Sprintf("%v ====> %v Pkg %v =====> %v", SPDXidDetail, green("DEPENDS_ON"), blue(fmt.Sprintf("%d", d)), relatedSPDXidDetail))
+}
 func (s *SPDX) PrintDigRels() {
-	rels := s.Relationships
-	var rel Relationships
-	var n int
-	_ = n
-	lenrels := len(rels)
-	var spdxids []string = make([]string, lenrels)
-	// var licenseinfo string
-	//
-	for id := 0; id < lenrels; id++ {
-		rel = rels[id]
-		spdxids = append(spdxids, rel.SpdxElementID)
-	}
-	unique_spdxIDs := removeDuplicateStr(spdxids)
-	len_unique_spdxIDs := len(unique_spdxIDs)
-	fmt.Println("No. of unique spdxID :", len_unique_spdxIDs)
-	// _ = len_unique_spdxIDs
-	var d int
-
-	// check if any valid spdxid describes is present
-	for _, rel1 := range rels {
-		switch rt := rel1.RelationshipType; rt {
-		case "DESCRIBES":
-			d++
-			// s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
+	// Load struct RelTypes based on types
+	s.GetRelationsforType()
+	var tmp string
+	fmt.Println(green("===================DESCRIBES/CONTAINS======================"))
+	for d, rel := range s.RelTypes.Describes {
+		d++
+		pkg, isPresent := s.getPKGforSPDXID(rel.SpdxElementID)
+		pkgRel, isPresentRel := s.getPKGforSPDXID(rel.RelatedSpdxElement)
+		if isPresent {
+			fmt.Println(fmt.Sprintf("Root Element %v %v %v %v %v", yellow(pkg.Name), yellow(pkg.VersionInfo), green("DESCRIBES"), yellow(pkgRel.Name), yellow(pkgRel.VersionInfo)))
+		} else if isPresentRel {
+			fmt.Println(fmt.Sprintf("Root Element %v %v %v %v", yellow(rel.SpdxElementID), green("DESCRIBES"), yellow(pkgRel.Name), yellow(pkgRel.VersionInfo)))
 		}
-
+		// SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
+		// if tmp != SPDXidDetail {
+		// 	fmt.Println(fmt.Sprintf("%v ====> %v", SPDXidDetail, green("DEPENDS_ON")))
+		// }
+		s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
+		// tmp = SPDXidDetail
 	}
-	// if describes is present then handle it
-	if d > 0 {
-		d = 0
-		fmt.Println(red("===================DESCRIBES OR CONTAINS======================"))
-		for _, rel1 := range rels {
-			switch rt := rel1.RelationshipType; rt {
-			case "DESCRIBES":
-				d++
-				s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
-			}
 
-		}
+	fmt.Println(blue("===================DEPENDS_ON/CONTAINS======================"))
 
-	}
-	// check if valid dependson relationship is present
-	d = 0
-	for _, rel1 := range rels {
-		switch rt := rel1.RelationshipType; rt {
-		case "DEPENDS_ON":
-			d++
-			// s.getdependson(d, rel1)
-			// s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
+	tmp = ""
+	for d, rel := range s.RelTypes.Dependson {
+		d++
+		SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
+		if tmp != SPDXidDetail {
+			fmt.Println(fmt.Sprintf("%v %v", SPDXidDetail, blue("DEPENDS_ON")))
 		}
-	}
-	if d > 0 {
-		d = 0
-		fmt.Println(red("===================DEPENDS_ON OR CONTAINS======================"))
-		for _, rel1 := range rels {
-			switch rt := rel1.RelationshipType; rt {
-			case "DEPENDS_ON":
-				d++
-				s.getdependson(d, rel1)
-				s.getspdxpkg(d, rel1.RelatedSpdxElement, rel1)
-			}
-		}
+		s.printdependson(d, rel)
+		s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
+
+		tmp = SPDXidDetail
 	}
 
 }

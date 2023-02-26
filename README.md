@@ -26,6 +26,9 @@ Display pkgs list with `sq pkgs` option
 Display files list with `sq files` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/files.png?raw=true)
 
+Display spdx relationships table and list with `sq rels` option
+![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/rels.png?raw=true)
+
 Display spdx relationships list with `sq rels dig` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/dig.png?raw=true)
 

@@ -42,9 +42,11 @@ To list first 5         : ./sq rels 5
 				panic(err)
 			}
 			s.PrintRels(i)
+
 		} else {
 			if lenRels > 0 {
 				s.PrintRels(lenRels)
+				s.PrintDigRels()
 			}
 		}
 	},
