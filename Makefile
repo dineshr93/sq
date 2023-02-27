@@ -58,6 +58,8 @@ compile:
 	GOOS=windows GOARCH=386 go build -o bin/${BINARY_NAME}-windows-386.exe main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/${BINARY_NAME}-linux-amd64 main.go
 	GOOS=windows GOARCH=amd64 go build -o bin/${BINARY_NAME}-windows-amd64.exe main.go
+	GOOS=darwin GOARCH=amd64 go build -o bin/${BINARY_NAME}-mac-amd64 main.go
+	# GOOS=darwin GOARCH=386 go build -o bin/${BINARY_NAME}-mac-386 main.go
 
 test: build
 	./bin/${BINARY_NAME} -h
