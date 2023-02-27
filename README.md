@@ -1,6 +1,6 @@
 # sq
 
-SPDX Query, A Visualization utility for SPDX 2.2 JSON Files
+SPDX Query, A Visualization utility for SPDX 2.2 & 2.3 JSON Files
 
 Note for newbies: SPDX is a format where sw entities discloses what open source libraries they have used in building their software. Security expers and legal compliance experts uses this data to check if they have any license issues or security vulnerability is there..
 

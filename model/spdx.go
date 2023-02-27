@@ -92,9 +92,10 @@ type Relationships struct {
 	RelatedSpdxElement string `json:"relatedSpdxElement,omitempty"`
 }
 type RelTypes struct {
-	Describes []Relationships
-	Dependson []Relationships
-	Contains  []Relationships
+	Describes     []Relationships
+	Dependson     []Relationships
+	Contains      []Relationships
+	GeneratedFrom []Relationships
 }
 
 func (s *SPDX) GetRelationsforType() {
@@ -103,6 +104,7 @@ func (s *SPDX) GetRelationsforType() {
 	var relDescribes []Relationships
 	var relDependson []Relationships
 	var relContains []Relationships
+	var generatedFrom []Relationships
 	for _, rel := range rels {
 		switch rt := rel.RelationshipType; rt {
 		case "DESCRIBES":
@@ -111,6 +113,8 @@ func (s *SPDX) GetRelationsforType() {
 			relDependson = append(relDependson, rel)
 		case "CONTAINS":
 			relContains = append(relContains, rel)
+		case "GENERATED_FROM":
+			relContains = append(generatedFrom, rel)
 		}
 	}
 	relTypes := RelTypes{
@@ -241,7 +245,7 @@ func (s *SPDX) PrintFiles(nf int) {
 	table.Header = &simpletable.Header{
 		Cells: []*simpletable.Cell{
 			{Align: simpletable.AlignCenter, Text: "#"},
-			{Align: simpletable.AlignCenter, Text: "FileName"},
+			{Align: simpletable.AlignCenter, Text: "List of Files"},
 			// {Align: simpletable.AlignCenter, Text: "LicenseConcluded"},
 			// {Align: simpletable.AlignCenter, Text: "LicenseInfoInFiles"},
 			// {Align: simpletable.AlignCenter, Text: "SPDXId"},
@@ -269,7 +273,7 @@ func (s *SPDX) PrintFiles(nf int) {
 
 		cells = append(cells, *&[]*simpletable.Cell{
 			{Text: fmt.Sprintf("%d", n)},
-			{Text: file.FileName},
+			{Text: red(file.FileName)},
 			// {Text: file.LicenseConcluded},
 			// {Text: licenseinfo},
 			// {Text: file.Spdxid},
@@ -456,6 +460,24 @@ func (s *SPDX) PrintFilesExt(nf int) {
 	table.SetStyle(simpletable.StyleUnicode)
 	table.Println()
 }
+
+func getPkgNameVersion(pkg Packages) (string, string) {
+	var isSha bool
+	var pkgName string = pkg.Name
+	var pkgVersion string = pkg.VersionInfo
+	for _, d := range shas {
+		if strings.HasPrefix(strings.ToLower(pkgName), d) {
+			isSha = true
+			break
+		}
+	}
+	if isSha {
+		pkgName = pkg.Description
+		pkgVersion = pkg.PrimaryPackagePurpose
+	}
+	return pkgName, pkgVersion
+}
+
 func (s *SPDX) Printpkgs(np int) {
 
 	table := simpletable.New()
@@ -488,16 +510,27 @@ func (s *SPDX) Printpkgs(np int) {
 	for id := 0; id < np; id++ {
 
 		pkg = pkgs[id]
+		// ===============================
+		pkgName, pkgVersion := getPkgNameVersion(pkg)
+		// ===================================
 
+		homepage := pkg.Homepage
+		if homepage == "" {
+			homepage = pkg.DownloadLocation
+		}
+		supplier := pkg.Supplier
+		if supplier == "" {
+			supplier = pkg.Originator
+		}
 		n = id + 1
 		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
 
 		cells = append(cells, *&[]*simpletable.Cell{
 			{Text: fmt.Sprintf("%d", n)},
-			{Text: pkg.Supplier},
-			{Text: pkg.Name},
-			{Text: pkg.VersionInfo},
-			{Text: pkg.Homepage},
+			{Text: supplier},
+			{Text: pkgName},
+			{Text: pkgVersion},
+			{Text: homepage},
 			// {Text: pkg.LicenseDeclared},
 			// {Text: pkg.LicenseConcluded},
 			// {Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
@@ -646,7 +679,7 @@ func (s *SPDX) PrintpkgsExt(np int) {
 
 }
 
-func (s *SPDX) PrintRels(np int) {
+func (s *SPDX) PrintRelsinSPDX(np int) {
 
 	table := simpletable.New()
 
@@ -719,6 +752,95 @@ func (s *SPDX) PrintRels(np int) {
 
 }
 
+func (s *SPDX) PrintRelsClarified(np int) {
+
+	table := simpletable.New()
+
+	table.Header = &simpletable.Header{
+		Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Text: "#"},
+			{Align: simpletable.AlignCenter, Text: "SpdxElement"},
+			{Align: simpletable.AlignCenter, Text: "RelationshipType"},
+			{Align: simpletable.AlignCenter, Text: "RelatedSpdxElement"},
+		},
+	}
+	// {Align: simpletable.AlignCenter, Text: "Checksums"},
+	// {Align: simpletable.AlignCenter, Text: "Algorithm - Checksums"},
+	rels := s.Relationships
+	var rel Relationships
+	var n int
+	// var licenseinfo string
+	lenrels := len(rels)
+	// fmt.Println(lenrels)
+	var cells [][]*simpletable.Cell
+	var relContainsCount int
+
+	for id := 0; id < np; id++ {
+
+		rel = rels[id]
+
+		n = id + 1
+		SpdxElementID := s.getPKGFileNameVersionforSPDXID(rel.SpdxElementID)
+		RelatedSpdxElement := s.getPKGFileNameVersionforSPDXID(rel.RelatedSpdxElement)
+		// licenseinfo = strings.Join(file.LicenseInfoInFiles, ", ")
+		switch rt := rel.RelationshipType; rt {
+		case "CONTAINS":
+			relContainsCount++
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: SpdxElementID},
+				{Text: red(rt)},
+				{Text: red(RelatedSpdxElement)},
+			})
+		case "DEPENDS_ON":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: SpdxElementID},
+				{Text: blue(rt)},
+				{Text: blue(RelatedSpdxElement)},
+			})
+		case "DESCRIBES":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: SpdxElementID},
+				{Text: green(rt)},
+				{Text: green(RelatedSpdxElement)},
+			})
+		case "GENERATED_FROM":
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: SpdxElementID},
+				{Text: yellow(rt)},
+				{Text: yellow(RelatedSpdxElement)},
+			})
+		default:
+			cells = append(cells, *&[]*simpletable.Cell{
+				{Text: fmt.Sprintf("%d", n)},
+				{Text: SpdxElementID},
+				{Text: gray(rt)},
+				{Text: RelatedSpdxElement},
+			})
+
+		}
+
+	}
+
+	table.Body = &simpletable.Body{Cells: cells}
+
+	if lenrels > 0 {
+		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
+			{Align: simpletable.AlignCenter, Span: 4, Text: blue(fmt.Sprintf("There are %d relationships", lenrels))},
+		}}
+	}
+	table.SetStyle(simpletable.StyleUnicode)
+	table.Println()
+
+	if relContainsCount == 0 {
+		s.PrintFiles(len(s.Files))
+	}
+
+}
+
 func removeDuplicateStr(strSlice []string) []string {
 	allKeys := make(map[string]bool)
 	list := []string{}
@@ -731,6 +853,35 @@ func removeDuplicateStr(strSlice []string) []string {
 	return list
 }
 
+var shas []string = []string{"sha1", "sha256", "sha512"}
+
+func (s *SPDX) getPKGFileNameVersionforSPDXID(spdxid string) string {
+	pkg, ispkgPresent := s.getPKGforSPDXID(spdxid)
+	if ispkgPresent {
+		pkgName, pkgVersion := getPkgNameVersion(pkg)
+		return fmt.Sprintf("%v %v", pkgName, pkgVersion)
+	} else {
+		file, isFilePresent := s.getFileforSPDXID(spdxid)
+		if isFilePresent {
+			return file.FileName
+		}
+	}
+	return spdxid
+}
+func (s *SPDX) getPKGFileforSPDXID(spdxid string) (Packages, bool, Files, bool) {
+	pkg, ispkgPresent := s.getPKGforSPDXID(spdxid)
+	if ispkgPresent {
+		return pkg, true, Files{}, false
+	} else {
+		file, isFilePresent := s.getFileforSPDXID(spdxid)
+
+		if isFilePresent {
+			return Packages{}, false, file, true
+		}
+	}
+	return Packages{}, false, Files{}, false
+}
+
 func (s *SPDX) getPKGforSPDXID(spdxid string) (Packages, bool) {
 	pkgs := s.Packages
 	for _, pkg := range pkgs {
@@ -740,14 +891,14 @@ func (s *SPDX) getPKGforSPDXID(spdxid string) (Packages, bool) {
 	}
 	return Packages{}, false
 }
-func (s *SPDX) getFileforSPDXID(spdxid string) Files {
+func (s *SPDX) getFileforSPDXID(spdxid string) (Files, bool) {
 	files := s.Files
 	for _, file_ := range files {
 		if spdxid == file_.Spdxid {
-			return file_
+			return file_, true
 		}
 	}
-	return Files{}
+	return Files{}, false
 }
 func (s *SPDX) getRelationshipForSPDXID(spdxid string, rels []Relationships) []Relationships {
 	var relTmp []Relationships
@@ -811,7 +962,7 @@ func (s *SPDX) printspdxpkg(d int, spdxID string, rel Relationships) {
 }
 
 func (s *SPDX) printspdxfile(i int, spdxID string) {
-	file := s.getFileforSPDXID(spdxID)
+	file, _ := s.getFileforSPDXID(spdxID)
 	i++
 	fmt.Println(green(fmt.Sprintf("    |-->File %v %v %v", blue(fmt.Sprintf("%d", i)), yellow("---->"), red(file.FileName))))
 }
@@ -824,37 +975,48 @@ func (s *SPDX) PrintDigRels() {
 	// Load struct RelTypes based on types
 	s.GetRelationsforType()
 	var tmp string
-	fmt.Println(green("===================DESCRIBES/CONTAINS======================"))
+
 	for d, rel := range s.RelTypes.Describes {
 		d++
 		pkg, isPresent := s.getPKGforSPDXID(rel.SpdxElementID)
 		pkgRel, isPresentRel := s.getPKGforSPDXID(rel.RelatedSpdxElement)
 		if isPresent {
+			fmt.Println(green("===================DESCRIBES/CONTAINS======================"))
 			fmt.Println(fmt.Sprintf("Root Element %v %v %v %v %v", yellow(pkg.Name), yellow(pkg.VersionInfo), green("DESCRIBES"), yellow(pkgRel.Name), yellow(pkgRel.VersionInfo)))
 		} else if isPresentRel {
+			fmt.Println(green("===================DESCRIBES/CONTAINS======================"))
 			fmt.Println(fmt.Sprintf("Root Element %v %v %v %v", yellow(rel.SpdxElementID), green("DESCRIBES"), yellow(pkgRel.Name), yellow(pkgRel.VersionInfo)))
 		}
-		// SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
-		// if tmp != SPDXidDetail {
-		// 	fmt.Println(fmt.Sprintf("%v ====> %v", SPDXidDetail, green("DEPENDS_ON")))
-		// }
 		s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
-		// tmp = SPDXidDetail
 	}
 
-	fmt.Println(blue("===================DEPENDS_ON/CONTAINS======================"))
-
-	tmp = ""
-	for d, rel := range s.RelTypes.Dependson {
-		d++
-		SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
-		if tmp != SPDXidDetail {
-			fmt.Println(fmt.Sprintf("%v %v", SPDXidDetail, blue("DEPENDS_ON")))
+	if len(s.RelTypes.GeneratedFrom) > 0 {
+		fmt.Println(blue("===================GENERATED_FROM======================"))
+		tmp = ""
+		for d, rel := range s.RelTypes.GeneratedFrom {
+			d++
+			SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
+			if tmp != SPDXidDetail {
+				fmt.Println(fmt.Sprintf("%v %v", SPDXidDetail, blue("GENERATED_FROM")))
+			}
+			// s.printdependson(d, rel)
+			s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
+			tmp = SPDXidDetail
 		}
-		s.printdependson(d, rel)
-		s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
-
-		tmp = SPDXidDetail
+	}
+	if len(s.RelTypes.Dependson) > 0 {
+		fmt.Println(blue("===================DEPENDS_ON/CONTAINS======================"))
+		tmp = ""
+		for d, rel := range s.RelTypes.Dependson {
+			d++
+			SPDXidDetail, _ := s.getPKGNameVersionDetailforRelsSPDXID(rel)
+			if tmp != SPDXidDetail {
+				fmt.Println(fmt.Sprintf("%v %v", SPDXidDetail, blue("DEPENDS_ON")))
+			}
+			s.printdependson(d, rel)
+			s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
+			tmp = SPDXidDetail
+		}
 	}
 
 }

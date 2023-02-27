@@ -41,12 +41,12 @@ To list first 5         : ./sq rels 5
 			if err != nil {
 				panic(err)
 			}
-			s.PrintRels(i)
+			s.PrintRelsClarified(i)
 
 		} else {
 			if lenRels > 0 {
-				s.PrintRels(lenRels)
-				s.PrintDigRels()
+				s.PrintRelsClarified(lenRels)
+				// s.PrintRelsinSPDX(lenRels)
 			}
 		}
 	},
