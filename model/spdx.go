@@ -18,15 +18,17 @@ import (
 
 type SPDX struct {
 	Spdxid                     string                       `json:"SPDXID,omitempty"`
+	Name                       string                       `json:"name,omitempty"`
 	SpdxVersion                string                       `json:"spdxVersion,omitempty"`
 	CreationInfo               CreationInfo                 `json:"creationInfo,omitempty"`
-	Name                       string                       `json:"name,omitempty"`
+
 	DataLicense                string                       `json:"dataLicense,omitempty"`
 	HasExtractedLicensingInfos []HasExtractedLicensingInfos `json:"hasExtractedLicensingInfos,omitempty"`
 	DocumentNamespace          string                       `json:"documentNamespace,omitempty"`
 	DocumentDescribes          []string                     `json:"documentDescribes,omitempty"`
-	Packages                   []Packages                   `json:"packages,omitempty"`
 	Files                      []Files                      `json:"files,omitempty"`
+	Packages                   []Packages                   `json:"packages,omitempty"`
+
 	Relationships              []Relationships              `json:"relationships,omitempty"`
 	RelTypes                   RelTypes                     `json:"reltypes,omitempty"`
 }
@@ -34,6 +36,10 @@ type CreationInfo struct {
 	Created            time.Time `json:"created,omitempty"`
 	Creators           []string  `json:"creators,omitempty"`
 	LicenseListVersion string    `json:"licenseListVersion,omitempty"`
+}
+type Checksums struct {
+	Algorithm     string `json:"algorithm,omitempty"`
+	ChecksumValue string `json:"checksumValue,omitempty"`
 }
 type HasExtractedLicensingInfos struct {
 	LicenseID     string `json:"licenseId,omitempty"`
@@ -46,24 +52,32 @@ type ExternalRefs struct {
 	ReferenceLocator  string `json:"referenceLocator,omitempty"`
 	ReferenceType     string `json:"referenceType,omitempty"`
 }
+type PackageVerificationCode struct {
+	PackageVerificationCodeValue string `json:"packageVerificationCodeValue,omitempty"`
+}
 type Packages struct {
 	Spdxid           string         `json:"SPDXID,omitempty"`
-	CopyrightText    string         `json:"copyrightText,omitempty"`
-	DownloadLocation string         `json:"downloadLocation,omitempty"`
-	ExternalRefs     []ExternalRefs `json:"externalRefs,omitempty"`
+	Name             string         `json:"name,omitempty"`
 	FilesAnalyzed    bool           `json:"filesAnalyzed,omitempty"`
+	CopyrightText    string         `json:"copyrightText,omitempty"`
+	Description             string                  `json:"description,omitempty"`
+	DownloadLocation string         `json:"downloadLocation,omitempty"`
+	PrimaryPackagePurpose   string                  `json:"primaryPackagePurpose,omitempty"`
+	Checksums               []Checksums             `json:"checksums,omitempty"`
+	ExternalRefs     []ExternalRefs `json:"externalRefs,omitempty"`
+
 	Homepage         string         `json:"homepage,omitempty"`
 	LicenseConcluded string         `json:"licenseConcluded,omitempty"`
 	LicenseDeclared  string         `json:"licenseDeclared,omitempty"`
-	Name             string         `json:"name,omitempty"`
+
 	Supplier         string         `json:"supplier,omitempty"`
+	Originator              string                  `json:"originator,omitempty"`
 	VersionInfo      string         `json:"versionInfo,omitempty"`
+	SourceInfo              string                  `json:"sourceInfo,omitempty"`
 	HasFiles         []string       `json:"hasFiles,omitempty"`
+	PackageVerificationCode PackageVerificationCode `json:"packageVerificationCode,omitempty"`
 }
-type Checksums struct {
-	Algorithm     string `json:"algorithm,omitempty"`
-	ChecksumValue string `json:"checksumValue,omitempty"`
-}
+
 type Files struct {
 	Spdxid             string      `json:"SPDXID,omitempty"`
 	Checksums          []Checksums `json:"checksums,omitempty"`
@@ -74,14 +88,17 @@ type Files struct {
 }
 type Relationships struct {
 	SpdxElementID      string `json:"spdxElementId,omitempty"`
-	RelatedSpdxElement string `json:"relatedSpdxElement,omitempty"`
 	RelationshipType   string `json:"relationshipType,omitempty"`
+	RelatedSpdxElement string `json:"relatedSpdxElement,omitempty"`
+
 }
 type RelTypes struct {
 	Describes []Relationships
 	Dependson []Relationships
 	Contains  []Relationships
 }
+
+
 
 func (s *SPDX) GetRelationsforType() {
 	rels := s.Relationships
