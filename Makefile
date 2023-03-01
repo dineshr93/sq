@@ -2,6 +2,7 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 OS := $(go version | cut -d' ' -f 4 | cut -d'/' -f 1)
 ARCH := $(go version | cut -d' ' -f 4 | cut -d'/' -f 2)
 BINARY_NAME :=  $(shell basename $(CURDIR))
+BINARY_NAME_FOR_JENKINS := sq
 
 
 ifeq ($(OS),Windows_NT)
@@ -50,6 +51,11 @@ build:
 	echo "make build"
 	go build -o ./bin/${BINARY_NAME} main.go
 	cp ./bin/${BINARY_NAME} .
+
+jenkins:
+	echo "make build"
+	go build -o ./bin/${BINARY_NAME_FOR_JENKINS} main.go
+	cp ./bin/${BINARY_NAME_FOR_JENKINS} .
 
 compile:
 	echo "Generating binary for every OS and Platform"
