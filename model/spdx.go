@@ -576,7 +576,6 @@ func (s *SPDX) PrintpkgsIP(np int) {
 			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
 			// {Align: simpletable.AlignCenter, Text: "DownloadLocation"},
 			{Align: simpletable.AlignCenter, Text: "CopyrightText"},
-			{Align: simpletable.AlignCenter, Text: "FilesAnalyzed"},
 			// {Align: simpletable.AlignCenter, Text: "Spdxid"},
 		},
 	}
@@ -605,10 +604,10 @@ func (s *SPDX) PrintpkgsIP(np int) {
 			// {Text: pkg.Homepage},
 			{Text: pkg.LicenseDeclared},
 			{Text: pkg.LicenseConcluded},
-
+			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
 			// {Text: pkg.DownloadLocation},
 			{Text: pkg.CopyrightText},
-			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
+
 			// {Text: pkg.Spdxid},
 		})
 
@@ -617,7 +616,7 @@ func (s *SPDX) PrintpkgsIP(np int) {
 
 	if lenPkgs > 0 {
 		table.Footer = &simpletable.Footer{Cells: []*simpletable.Cell{
-			{Align: simpletable.AlignCenter, Span: 8, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
+			{Align: simpletable.AlignCenter, Span: 7, Text: blue(fmt.Sprintf("There are %d pkgs", lenPkgs))},
 		}}
 	}
 	table.SetStyle(simpletable.StyleUnicode)

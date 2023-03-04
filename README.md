@@ -32,6 +32,9 @@ Display spdx relationships table and list with `sq rels` option
 Display spdx relationships list with `sq rels dig` option
 ![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/dig.png?raw=true)
 
+Display IP Details list with `sq pkgs ip` option
+![Sample](https://github.com/dineshr93/sq/blob/main/screenshots/ip.png?raw=true)
+
 ## Getting Started
 
 Contains following commands
