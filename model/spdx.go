@@ -207,10 +207,18 @@ func (s *SPDX) PrintMeta() {
 		{Text: s.DocumentNamespace},
 	})
 	idx++
+	var pkgVersionNames []string
+	for _, spdxID := range s.DocumentDescribes {
+		pkg, isPresent := s.getPKGforSPDXID(spdxID)
+		if isPresent {
+			pkgVersionNames = append(pkgVersionNames, fmt.Sprintf("%v-%v", pkg.Name, pkg.VersionInfo))
+		}
+	}
 	cells = append(cells, []*simpletable.Cell{
 		{Text: fmt.Sprintf("%d", idx)},
 		{Text: blue("Document Describes")},
-		{Text: strings.Join(s.DocumentDescribes, ", ")},
+
+		{Text: strings.Join(pkgVersionNames, ", ")},
 	})
 	idx++
 	cells = append(cells, []*simpletable.Cell{

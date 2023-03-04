@@ -75,7 +75,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "YOUR SBOM JSON FILE (default is $CURRENT_DIR/sbom.spdx.json)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "YOUR SBOM JSON FILE (default is $CURRENT_DIR/sbom.spdx.json)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
