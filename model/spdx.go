@@ -560,6 +560,38 @@ func (s *SPDX) Printpkgs(np int) {
 
 }
 
+const noassert = "NOASSERTION"
+
+func (s *SPDX) ExtractLicnese(license_text string) string {
+
+	if license_text == noassert || license_text == "" {
+		return noassert
+	}
+	if !strings.Contains(license_text, "LicenseRef-") {
+		return license_text
+	}
+	if strings.Contains(license_text, "LicenseRef-") {
+		license_infos := s.HasExtractedLicensingInfos
+		if len(license_infos) > 0 {
+			for _, lic_info := range license_infos {
+				if license_text == lic_info.LicenseID {
+					if lic_info.Name == "" {
+						if lic_info.ExtractedText != "" {
+							return lic_info.ExtractedText
+						} else {
+							return noassert
+						}
+					} else {
+						return lic_info.Name
+
+					}
+				}
+			}
+		}
+	}
+	return noassert
+}
+
 func (s *SPDX) PrintpkgsIP(np int) {
 
 	table := simpletable.New()
@@ -602,8 +634,8 @@ func (s *SPDX) PrintpkgsIP(np int) {
 			{Text: pkg.Name},
 			{Text: pkg.VersionInfo},
 			// {Text: pkg.Homepage},
-			{Text: pkg.LicenseDeclared},
-			{Text: pkg.LicenseConcluded},
+			{Text: s.ExtractLicnese(pkg.LicenseDeclared)},
+			{Text: s.ExtractLicnese(pkg.LicenseConcluded)},
 			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
 			// {Text: pkg.DownloadLocation},
 			{Text: pkg.CopyrightText},
@@ -665,8 +697,8 @@ func (s *SPDX) PrintpkgsExt(np int) {
 			{Text: pkg.Name},
 			{Text: pkg.VersionInfo},
 			{Text: pkg.Homepage},
-			{Text: pkg.LicenseDeclared},
-			{Text: pkg.LicenseConcluded},
+			{Text: s.ExtractLicnese(pkg.LicenseDeclared)},
+			{Text: s.ExtractLicnese(pkg.LicenseConcluded)},
 			{Text: fmt.Sprintf("%v", pkg.FilesAnalyzed)},
 			{Text: pkg.DownloadLocation},
 			{Text: pkg.CopyrightText},

@@ -71,6 +71,7 @@ test: build
 	./bin/${BINARY_NAME} -h
 copy: test
 	cp bin/${BINARY_NAME} /sw/bin/
+	cp bin/${BINARY_NAME}-windows-amd64.exe /mnt/c/bugtracker/sq.exe
 
 help: ## Show this help
 	@${HELP_CMD}
