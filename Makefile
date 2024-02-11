@@ -3,7 +3,7 @@ OS := $(go version | cut -d' ' -f 4 | cut -d'/' -f 1)
 ARCH := $(go version | cut -d' ' -f 4 | cut -d'/' -f 2)
 BINARY_NAME :=  $(shell basename $(CURDIR))
 BINARY_NAME_FOR_JENKINS := sq
-
+IMAGE ?= dineshr93/sq:1.0
 
 ifeq ($(OS),Windows_NT)
 	BINARY_NAME := ${BINARY_NAME}.exe
@@ -80,3 +80,20 @@ copy: test
 
 help: ## Show this help
 	@${HELP_CMD}
+
+.PHONY: dbuild # Build the container image
+dbuild:
+	@docker buildx create --use --name=crossplat --node=crossplat && \
+	docker buildx build \
+		--output "type=docker,push=false" \
+		--tag $(IMAGE) \
+		.
+
+.PHONY: dpublish # Push the image to the remote registry
+dpublish:
+	@docker buildx create --use --name=crossplat --node=crossplat && \
+	docker buildx build \
+		--platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
+		--output "type=image,push=true" \
+		--tag $(IMAGE) \
+		.
