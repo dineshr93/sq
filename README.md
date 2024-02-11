@@ -6,6 +6,31 @@ Note for newbies: SPDX is a format where sw entities discloses what open source 
 
 https://en.m.wikipedia.org/wiki/Software_Package_Data_Exchange
 
+## Docker image
+```
+docker pull dineshr93/sq:1.0
+```
+
+## Load alias
+
+```
+alias dr='docker run'
+alias p='echo ${PWD}'
+alias sq='dr -v ${PWD}:${PWD} dineshr93/sq:1.0'
+```
+
+## command
+
+```
+sq -c $(p)/ubuntu20.04.spdx.json -h
+```
+
+### example
+```
+sq -c $(p)/ubuntu20.04.spdx.json pkgs 5
+
+```
+
 ## Description
 
 A binary to query the spdx-sboms-JSON results.
