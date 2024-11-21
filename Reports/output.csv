@@ -1,0 +1,5 @@
+Name,Spdxid,Version,License,Copyright
+glibc,SPDXRef-Package,2.11.1,(LGPL-2.0-only OR LicenseRef-3),Copyright 2008-2010 John Smith
+Apache Commons Lang,SPDXRef-fromDoap-1,,NOASSERTION,NOASSERTION
+Jena,SPDXRef-fromDoap-0,,NOASSERTION,NOASSERTION
+Saxon,SPDXRef-Saxon,8.8,MPL-1.0,Copyright Saxonica Ltd
