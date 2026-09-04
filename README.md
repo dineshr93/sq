@@ -1,6 +1,6 @@
 # sq
 
-SPDX Query, Making SPDX (2.2 & 2.3) JSON Files human readable
+SPDX Query - Making SPDX (2.2, 2.3 & 3.0.1) JSON Files human readable
 
 Note for newbies: SPDX is a format where sw entities discloses what open source libraries they have used in building their software. Security expers and legal compliance experts uses this data to check if they have any license issues or security vulnerability is there..
 
@@ -33,7 +33,11 @@ sq -c $(p)/ubuntu20.04.spdx.json pkgs 5
 
 ## Description
 
-A binary to query the spdx-sboms-JSON results.
+A binary to query the spdx-sbom JSON results.
+
+SPDX 3.0.1 documents are auto-detected on load and rendered through the same
+commands; 3.0-only constructs that have no 2.x equivalent are counted in
+`sq meta` under *3.0 elements w/o 2.x mapping*.
 
 By default uses _$HOME/sbom.spdx.json_ file to load the data. (you can pass custom \*.spdx.json file using _--config_ option any time)
 
@@ -76,6 +80,7 @@ Contains following commands
 - Cobra
 - Viper
 - Simple table
+- tools-golang (SPDX 3.0.1 parser)
 
 ### Installing
 
@@ -123,12 +128,46 @@ sq pkgs > sbom-pkgs.txt
 sq rels > sbom-rels.txt
 ```
 
+## Build from source
+
+Requires Go 1.23.5+
+
+```
+git clone https://github.com/dineshr93/sq && cd sq
+make build    # builds ./bin/sq and copies it to ./sq
+go test ./... # run the test suite
+```
+
+## Sample data
+
+Grab real SPDX 3.0.1 SBOMs from the official examples repo:
+
+```
+mkdir -p /tmp/sq-samples && cd /tmp/sq-samples
+B=raw.githubusercontent.com/spdx/spdx-examples/master
+curl -fsSL -o example1.spdx3.json                    $B/software/example1/spdx3.0/example1.spdx3.json
+curl -fsSL -o example3-bin.spdx3.json                $B/software/example3/spdx3.0/example3-bin.spdx3.json
+curl -fsSL -o examplemaven-0.0.1-enriched.spdx3.json $B/software/example14/spdx3.0/examplemaven-0.0.1-enriched.spdx3.json
+```
+
+Then point sq at any of them:
+
+```
+./sq meta --config /tmp/sq-samples/example1.spdx3.json
+./sq pkgs --config /tmp/sq-samples/examplemaven-0.0.1-enriched.spdx3.json
+```
+
+Or drop the files into your current folder - sq auto-detects and loads the
+first valid SPDX JSON without `--config`.
+
 ## Authors
 
 Dinesh Ravi
 
 ## Version History
 
+- 1.1.0
+  - SPDX 3.0.1 support (auto-detected; all commands work on 2.x and 3.0.1)
 - 1.0.0
   - Initial Release
 

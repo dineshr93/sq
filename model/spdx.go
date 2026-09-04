@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
@@ -30,6 +31,11 @@ type SPDX struct {
 
 	Relationships []Relationships `json:"relationships,omitempty"`
 	RelTypes      RelTypes        `json:"reltypes,omitempty"`
+
+	// Sidecar fields for SPDX 3.0.1 (JSON-LD) input. These have no SPDX 2.x
+	// equivalent and are never serialized.
+	Profiles        []string       `json:"-"`
+	SkippedElements map[string]int `json:"-"`
 }
 type CreationInfo struct {
 	Created            time.Time `json:"created,omitempty"`
@@ -135,6 +141,13 @@ func (t *SPDX) Load(filename string) error {
 	if len(file) == 0 {
 		return err
 	}
+	is3, err := detectSPDXVersion(file)
+	if err != nil {
+		return err
+	}
+	if is3 != "" {
+		return t.loadV3(file)
+	}
 	err = json.Unmarshal(file, t)
 	if err != nil {
 		return err
@@ -237,6 +250,27 @@ func (s *SPDX) PrintMeta() {
 		{Text: blue("Number of Relationships")},
 		{Text: red(fmt.Sprintf("%d", len(s.Relationships)))},
 	})
+	if len(s.Profiles) > 0 {
+		idx++
+		cells = append(cells, []*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", idx)},
+			{Text: blue("3.0 Profiles")},
+			{Text: strings.Join(s.Profiles, ", ")},
+		})
+	}
+	if len(s.SkippedElements) > 0 {
+		idx++
+		var skipped []string
+		for name := range s.SkippedElements {
+			skipped = append(skipped, fmt.Sprintf("%s: %d", name, s.SkippedElements[name]))
+		}
+		sort.Strings(skipped)
+		cells = append(cells, []*simpletable.Cell{
+			{Text: fmt.Sprintf("%d", idx)},
+			{Text: blue("3.0 elements w/o 2.x mapping")},
+			{Text: strings.Join(skipped, ", ")},
+		})
+	}
 
 	table.Body = &simpletable.Body{Cells: cells}
 

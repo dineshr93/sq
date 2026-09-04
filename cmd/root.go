@@ -87,8 +87,8 @@ func isvalidSPDXJSONFile(spdxjsonFile string) bool {
 		fmt.Println("Error:", spdxjsonFile, " Not a JSON file")
 		return false
 	}
-	// check if valid json if SPDXID Keyword is present in file
-	if !isStringInFile(spdxjsonFile, "SPDXID") {
+	// check if valid json: 2.x carries an SPDXID keyword, 3.x a JSON-LD @context
+	if !isStringInFile(spdxjsonFile, "SPDXID") && !isStringInFile(spdxjsonFile, `"@context"`) {
 		fmt.Println("Error: Not a Valid SPDX JSON file")
 		return false
 	}
