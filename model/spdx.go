@@ -994,13 +994,12 @@ func (s *SPDX) getRelationshipForSPDXID(spdxid string, rels []Relationships) []R
 }
 func (s *SPDX) getPKGNameVersionDetailforRelsSPDXID(rel Relationships) (string, string) {
 	var SPDXidDetail, relatedSPDXidDetail string
-	spdxpkg, _ := s.getPKGforSPDXID(rel.SpdxElementID)
-	SPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(spdxpkg.Name), yellow("|"), blue(spdxpkg.VersionInfo))
-	relatedspdxpkg, _ := s.getPKGforSPDXID(rel.RelatedSpdxElement)
-	if len(relatedspdxpkg.HasFiles) > 0 {
-		relatedSPDXidDetail = fmt.Sprintf("%v %v version: %v", yellow(relatedspdxpkg.Name), yellow("|"), yellow(relatedspdxpkg.VersionInfo))
+	SPDXidDetail = fmt.Sprintf("%v %v", blue(s.getPKGFileNameVersionforSPDXID(rel.SpdxElementID)), yellow("|"))
+	relPkg, _ := s.getPKGforSPDXID(rel.RelatedSpdxElement)
+	if len(relPkg.HasFiles) > 0 {
+		relatedSPDXidDetail = fmt.Sprintf("%v %v", yellow(s.getPKGFileNameVersionforSPDXID(rel.RelatedSpdxElement)), yellow("|"))
 	} else {
-		relatedSPDXidDetail = fmt.Sprintf("%v %v version: %v", blue(relatedspdxpkg.Name), yellow("|"), blue(relatedspdxpkg.VersionInfo))
+		relatedSPDXidDetail = fmt.Sprintf("%v %v", blue(s.getPKGFileNameVersionforSPDXID(rel.RelatedSpdxElement)), yellow("|"))
 	}
 	return SPDXidDetail, relatedSPDXidDetail
 }
