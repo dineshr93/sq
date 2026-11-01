@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -62,7 +63,7 @@ func findFiles(root, ext string) []string {
 func isStringInFile(anyFile, text string) bool {
 	b, err := ioutil.ReadFile(anyFile)
 	if err != nil {
-		panic(err)
+		return false
 	}
 	s := string(b)
 	// //check whether s contains substring text
@@ -93,6 +94,22 @@ func isvalidSPDXJSONFile(spdxjsonFile string) bool {
 		return false
 	}
 	return true
+}
+
+// parseCount returns the requested row count from args, or a cobra-style
+// error string when args[0] is not a non-negative integer.
+func parseCount(args []string) (int, error) {
+	if len(args) == 0 {
+		return 0, nil
+	}
+	i, err := strconv.Atoi(args[0])
+	if err != nil {
+		return 0, fmt.Errorf("argument %q is not a number", args[0])
+	}
+	if i < 0 {
+		return 0, fmt.Errorf("argument %q is negative", args[0])
+	}
+	return i, nil
 }
 
 // initConfig reads in config file and ENV variables if set.

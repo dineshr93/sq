@@ -16,3 +16,7 @@ sbom_2023-02-24_100502.spdx.json
 /.idea/workspace.xml
 /.idea/vcs.xml
 /.idea/sq.iml
+.metrics/
+.pytest_cache/
+tools/
+

@@ -8,7 +8,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/dineshr93/sq/model"
 	"github.com/spf13/cobra"
@@ -35,9 +34,10 @@ To list first 5     : ./sq pkgs 5`,
 		lenPkgs := len(pkgs)
 
 		if len(args) > 0 {
-			i, err := strconv.Atoi(args[0])
+			i, err := parseCount(args)
 			if err != nil {
-				panic(err)
+				fmt.Fprintln(os.Stderr, err.Error())
+				os.Exit(1)
 			}
 			s.Printpkgs(i)
 		} else {

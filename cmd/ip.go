@@ -6,7 +6,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/dineshr93/sq/model"
 	"github.com/spf13/cobra"
@@ -30,9 +29,10 @@ var ipCmd = &cobra.Command{
 		lenPkgs := len(pkgs)
 
 		if len(args) > 0 {
-			i, err := strconv.Atoi(args[0])
+			i, err := parseCount(args)
 			if err != nil {
-				panic(err)
+				fmt.Fprintln(os.Stderr, err.Error())
+				os.Exit(1)
 			}
 			s.PrintpkgsIP(i)
 		} else {

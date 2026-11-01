@@ -6,7 +6,6 @@ package model
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"sort"
@@ -109,7 +108,7 @@ func (s *SPDX) GetRelationsforType() {
 	var relDescribes []Relationships
 	var relDependson []Relationships
 	var relContains []Relationships
-	var generatedFrom []Relationships
+	var relGeneratedFrom []Relationships
 	for _, rel := range rels {
 		switch rt := rel.RelationshipType; rt {
 		case "DESCRIBES":
@@ -119,27 +118,25 @@ func (s *SPDX) GetRelationsforType() {
 		case "CONTAINS":
 			relContains = append(relContains, rel)
 		case "GENERATED_FROM":
-			relContains = append(generatedFrom, rel)
+			relGeneratedFrom = append(relGeneratedFrom, rel)
 		}
 	}
 	relTypes := RelTypes{
-		Describes: relDescribes,
-		Dependson: relDependson,
-		Contains:  relContains,
+		Describes:     relDescribes,
+		Dependson:     relDependson,
+		Contains:      relContains,
+		GeneratedFrom: relGeneratedFrom,
 	}
 	s.RelTypes = relTypes
 }
 func (t *SPDX) Load(filename string) error {
 	file, err := os.ReadFile(filename)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return nil
-		}
 		return err
 	}
 
 	if len(file) == 0 {
-		return err
+		return fmt.Errorf("empty SPDX file: %s", filename)
 	}
 	is3, err := detectSPDXVersion(file)
 	if err != nil {
@@ -305,7 +302,7 @@ func (s *SPDX) PrintFiles(nf int) {
 	// fmt.Println(lenFiles)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < nf; id++ {
+	for id := 0; id < nf && id < lenFiles; id++ {
 
 		file = files[id]
 
@@ -361,7 +358,7 @@ func (s *SPDX) PrintFilesCheksum(nf int) {
 	// fmt.Println(lenFiles)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < nf; id++ {
+	for id := 0; id < nf && id < lenFiles; id++ {
 
 		file = files[id]
 
@@ -417,7 +414,7 @@ func (s *SPDX) PrintFilesIP(nf int) {
 	// fmt.Println(lenFiles)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < nf; id++ {
+	for id := 0; id < nf && id < lenFiles; id++ {
 
 		file = files[id]
 
@@ -472,7 +469,7 @@ func (s *SPDX) PrintFilesExt(nf int) {
 	// fmt.Println(lenFiles)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < nf; id++ {
+	for id := 0; id < nf && id < lenFiles; id++ {
 
 		file = files[id]
 
@@ -548,7 +545,7 @@ func (s *SPDX) Printpkgs(np int) {
 	// fmt.Println(lenPkgs)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < np; id++ {
+	for id := 0; id < np && id < lenPkgs; id++ {
 
 		pkg = pkgs[id]
 		// ===============================
@@ -654,7 +651,7 @@ func (s *SPDX) PrintpkgsIP(np int) {
 	// fmt.Println(lenPkgs)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < np; id++ {
+	for id := 0; id < np && id < lenPkgs; id++ {
 
 		pkg = pkgs[id]
 
@@ -717,7 +714,7 @@ func (s *SPDX) PrintpkgsExt(np int) {
 	// fmt.Println(lenPkgs)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < np; id++ {
+	for id := 0; id < np && id < lenPkgs; id++ {
 
 		pkg = pkgs[id]
 
@@ -773,7 +770,7 @@ func (s *SPDX) PrintRelsinSPDX(np int) {
 	// fmt.Println(lenrels)
 	var cells [][]*simpletable.Cell
 
-	for id := 0; id < np; id++ {
+	for id := 0; id < np && id < lenrels; id++ {
 
 		rel = rels[id]
 
@@ -847,7 +844,7 @@ func (s *SPDX) PrintRelsClarified(np int) {
 	var cells [][]*simpletable.Cell
 	var relContainsCount int
 
-	for id := 0; id < np; id++ {
+	for id := 0; id < np && id < lenrels; id++ {
 
 		rel = rels[id]
 
@@ -1048,6 +1045,30 @@ func (s *SPDX) PrintDigRels() {
 	s.GetRelationsforType()
 	var tmp string
 
+	if len(s.RelTypes.Describes) == 0 && len(s.RelTypes.Contains) > 0 {
+		// No DESCRIBES root (e.g. a 3.0 dataset whose root element has no
+		// 2.x mapping): dig from the CONTAINS sources instead of printing
+		// nothing.
+		fmt.Println(green("===================CONTAINS====================== "))
+		seen := map[string]bool{}
+		for d, rel := range s.RelTypes.Contains {
+			d++
+			if seen[rel.SpdxElementID] {
+				continue
+			}
+			seen[rel.SpdxElementID] = true
+			if pkg, ok := s.getPKGforSPDXID(rel.SpdxElementID); ok {
+				fmt.Println(fmt.Sprintf("Root Element %v %v %v", yellow(pkg.Name), yellow("|"), green("CONTAINS")))
+				for i, f := range s.getRelationshipForSPDXID(rel.SpdxElementID, s.RelTypes.Contains) {
+					s.printspdxfile(i, f.RelatedSpdxElement)
+				}
+			} else {
+				fmt.Println(fmt.Sprintf("Root Element %v %v", yellow(s.getPKGFileNameVersionforSPDXID(rel.SpdxElementID)), green("CONTAINS")))
+				s.printspdxfile(0, rel.RelatedSpdxElement)
+			}
+		}
+	}
+
 	for d, rel := range s.RelTypes.Describes {
 		d++
 		pkg, isPresent := s.getPKGforSPDXID(rel.SpdxElementID)
@@ -1058,6 +1079,10 @@ func (s *SPDX) PrintDigRels() {
 		} else if isPresentRel {
 			fmt.Println(green("===================DESCRIBES/CONTAINS======================"))
 			fmt.Println(fmt.Sprintf("Root Element %v %v %v %v", yellow(rel.SpdxElementID), green("DESCRIBES"), yellow(pkgRel.Name), yellow(pkgRel.VersionInfo)))
+		} else {
+			// file -> file DESCRIBES (e.g. dataset codebook describes data.csv)
+			fmt.Println(green("===================DESCRIBES=============================="))
+			fmt.Println(fmt.Sprintf("File %v DESCRIBES %v", yellow(s.getPKGFileNameVersionforSPDXID(rel.SpdxElementID)), yellow(s.getPKGFileNameVersionforSPDXID(rel.RelatedSpdxElement))))
 		}
 		s.printspdxpkg(d, rel.RelatedSpdxElement, rel)
 	}
