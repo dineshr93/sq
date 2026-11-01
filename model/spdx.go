@@ -332,6 +332,20 @@ func (s *SPDX) PrintFiles(nf int) {
 	table.Println()
 }
 
+func firstChecksum(f Files) string {
+	if len(f.Checksums) == 0 {
+		return noassert
+	}
+	return f.Checksums[0].ChecksumValue
+}
+
+func firstChecksumAlg(f Files) string {
+	if len(f.Checksums) == 0 {
+		return noassert
+	}
+	return f.Checksums[0].Algorithm
+}
+
 func (s *SPDX) PrintFilesCheksum(nf int) {
 
 	table := simpletable.New()
@@ -372,8 +386,8 @@ func (s *SPDX) PrintFilesCheksum(nf int) {
 			// {Text: licenseinfo},
 			// {Text: file.Spdxid},
 			// {Text: file.CopyrightText},
-			{Text: file.Checksums[0].ChecksumValue},
-			{Text: file.Checksums[0].Algorithm},
+			{Text: firstChecksum(file)},
+			{Text: firstChecksumAlg(file)},
 		})
 
 	}
@@ -483,8 +497,8 @@ func (s *SPDX) PrintFilesExt(nf int) {
 			{Text: licenseinfo},
 			{Text: file.Spdxid},
 			{Text: file.CopyrightText},
-			{Text: file.Checksums[0].ChecksumValue},
-			{Text: file.Checksums[0].Algorithm},
+			{Text: firstChecksum(file)},
+			{Text: firstChecksumAlg(file)},
 		})
 
 	}
